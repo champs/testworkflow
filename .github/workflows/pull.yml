@@ -1,0 +1,23 @@
+name: 'On PR State'
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - review_requested
+      - converted_to_draft
+jobs:
+  on_review:
+    name: 'PR Actions'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@master
+      - name: Labeling PR
+        run: |
+          python ./scripts/workflows/github_label_workflow.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
