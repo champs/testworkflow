@@ -33,20 +33,21 @@ API_HEADERS = {
     "Content-Type": "application/json"
 }
 
-def get_event_file():
-    """ getting github event file"""
-        
-    with open(GITHUB_EVENT_PATH) as f:
-        data = json.load(f)
-    print(json.dumps(data, indent=3))
-    return data
 
 # helper function
+
 def get_pr(pr_number):
     """ getting PR data """
     r = requests.get(f"{REPO_URL}/pulls/{pr_number}", headers=API_HEADERS)
-    # print(json.dumps(r.json(), indent=3))
     return r.json()
+
+def get_reviews(pr_number):
+    """ getting PR reviews
+    """
+    r = requests.get(f"{REPO_URL}/pulls/{pr_number}/reviews", headers=API_HEADERS)
+    # print(json.dumps(r.json(), indent=3))
+    
+    return [reviews["state"] for reviews in r.json()]
 
 def get_labels(pr_number):
     """ getting PR's labels """
@@ -122,6 +123,8 @@ def label_pr_by_state(pr_number):
     }
 
     data = get_pr(pr_number)
+    reviews = get_reviews(pr_number)
+    print(reviews)
     draft = data["draft"]
     state = data["state"]
 
@@ -138,6 +141,12 @@ def label_pr_by_state(pr_number):
         label = state_mapping[state]
     else:
         label = "requires-review"
+    # last review activity
+    if reviews:
+        if reviews[-1] in state_mapping:
+            label = state_mapping[reviews[-1]]
+        else:
+            print(reviews)
 
     manage_labels(pr_number, 
         adding_labels=[label], 
