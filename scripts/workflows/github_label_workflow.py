@@ -20,7 +20,7 @@ SIZE_L=200
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 GITHUB_REPOSITORY = "champs/testworkflow"
-GITHUB_EVENT_PATH = os.getenv("GITHUB_EVENT_PATH")
+GITHUB_EVENT_PATH = os.getenv("GITHUB_EVENT_PATH", "/github/workflow/event.json")
 
 PR_NUMBER = os.getenv("PR_NUMBER")
 
@@ -33,10 +33,19 @@ API_HEADERS = {
     "Content-Type": "application/json"
 }
 
+def get_event_file():
+    """ getting github event file"""
+        
+    with open(GITHUB_EVENT_PATH) as f:
+        data = json.load(f)
+    print(json.dumps(data, indent=3))
+    return data
+
 # helper function
 def get_pr(pr_number):
     """ getting PR data """
     r = requests.get(f"{REPO_URL}/pulls/{pr_number}", headers=API_HEADERS)
+    # print(json.dumps(r.json(), indent=3))
     return r.json()
 
 def get_labels(pr_number):
@@ -137,3 +146,4 @@ def label_pr_by_state(pr_number):
 if __name__ == "__main__":
     label_pr_by_state(PR_NUMBER)
     label_pr_by_size(PR_NUMBER)
+    get_event_file()
