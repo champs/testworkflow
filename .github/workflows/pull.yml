@@ -1,7 +1,6 @@
 name: 'On Review'
 on:
   pull_request:
-    types: [opened, ready_for_review]
 
 jobs:
   on_review:
