@@ -1,7 +1,12 @@
 name: 'On Review'
 on:
   pull_request:
-
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - review_requested
 jobs:
   on_review:
     name: 'PR Actions'
