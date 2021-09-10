@@ -19,8 +19,7 @@ SIZE_M=100
 SIZE_L=200
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_REPOSITORY = "champs/testworkflow"
-GITHUB_EVENT_PATH = os.getenv("GITHUB_EVENT_PATH", "/github/workflow/event.json")
+GITHUB_REPOSITORY = os.getenv("GITHUB_REPOSITORY", "champs/testworkflow")
 
 PR_NUMBER = os.getenv("PR_NUMBER")
 
@@ -45,9 +44,8 @@ def get_reviews(pr_number):
     """ getting PR reviews
     """
     r = requests.get(f"{REPO_URL}/pulls/{pr_number}/reviews", headers=API_HEADERS)
-    # print(json.dumps(r.json(), indent=3))
-    
-    return [reviews["state"] for reviews in r.json()]
+    print(json.dumps(r.json(), indent=3))
+    return [reviews["state"] for reviews in r.json() if reviews["state"] != "COMMENTED"]
 
 def get_labels(pr_number):
     """ getting PR's labels """
@@ -155,4 +153,3 @@ def label_pr_by_state(pr_number):
 if __name__ == "__main__":
     label_pr_by_state(PR_NUMBER)
     label_pr_by_size(PR_NUMBER)
-    get_event_file()
